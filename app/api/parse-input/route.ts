@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { createChecklistItem, createEvent, createWishlistItem } from '@/lib/db'
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+export const dynamic = 'force-dynamic'
 
 // The JSON schema the AI must always return
 const SYSTEM_PROMPT = `You are the Coolist Assistant. Your job is to take raw family notes and return a structured JSON object.
@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 1. Ask the AI to parse the input
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   let items: ParsedItem[]
   try {
     const completion = await openai.chat.completions.create({

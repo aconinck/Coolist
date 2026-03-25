@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   const { url } = await req.json()
@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
   const snippet = (head + html.slice(0, 2000)).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')
 
   // Ask the AI to summarize the product
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   try {
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
