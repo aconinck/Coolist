@@ -2,187 +2,145 @@
 
 import { useState } from 'react'
 import MagicInput from '@/components/MagicInput'
-import Checklist from '@/components/Checklist'
-import Wishlist from '@/components/Wishlist'
-import EventCalendar from '@/components/EventCalendar'
+import HomeTab from '@/components/HomeTab'
+import ListsTab from '@/components/ListsTab'
+import CalendarTab from '@/components/CalendarTab'
+import BillsTab from '@/components/BillsTab'
+import AccountTab from '@/components/AccountTab'
 
-type Tab = 'checklist' | 'wishlist' | 'events'
+type Tab = 'home' | 'lists' | 'calendar' | 'bills' | 'account'
 
-const TABS: { id: Tab; label: string; count?: number }[] = [
-  { id: 'checklist', label: 'List' },
-  { id: 'wishlist', label: 'Wishlist' },
-  { id: 'events', label: 'Calendar' },
+const TABS: { id: Tab; label: string; icon: (active: boolean) => React.ReactNode }[] = [
+  {
+    id: 'home',
+    label: 'Home',
+    icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M3 9.5L11 3l8 6.5V19a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"
+          stroke={active ? '#e87648' : '#a89d96'} strokeWidth="1.6"
+          fill={active ? '#fdf0e8' : 'none'} strokeLinejoin="round"/>
+        <path d="M8 20v-7h6v7" stroke={active ? '#e87648' : '#a89d96'} strokeWidth="1.6" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'lists',
+    label: 'Lists',
+    icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <rect x="3" y="3" width="16" height="16" rx="4"
+          fill={active ? '#fdf0e8' : 'none'}
+          stroke={active ? '#e87648' : '#a89d96'} strokeWidth="1.6"/>
+        <path d="M7 8h8M7 12h5M7 16h6" stroke={active ? '#e87648' : '#a89d96'} strokeWidth="1.6" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'calendar',
+    label: 'Calendar',
+    icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <rect x="3" y="4" width="16" height="15" rx="3"
+          fill={active ? '#fdf0e8' : 'none'}
+          stroke={active ? '#e87648' : '#a89d96'} strokeWidth="1.6"/>
+        <path d="M3 9h16M8 3v3M14 3v3" stroke={active ? '#e87648' : '#a89d96'} strokeWidth="1.6" strokeLinecap="round"/>
+        <circle cx="11" cy="13.5" r="1" fill={active ? '#e87648' : '#a89d96'}/>
+      </svg>
+    ),
+  },
+  {
+    id: 'bills',
+    label: 'Bills',
+    icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <rect x="2" y="6" width="18" height="12" rx="3"
+          fill={active ? '#fdf0e8' : 'none'}
+          stroke={active ? '#e87648' : '#a89d96'} strokeWidth="1.6"/>
+        <path d="M2 10h18" stroke={active ? '#e87648' : '#a89d96'} strokeWidth="1.6"/>
+        <circle cx="6.5" cy="14.5" r="1" fill={active ? '#e87648' : '#a89d96'}/>
+      </svg>
+    ),
+  },
+  {
+    id: 'account',
+    label: 'Account',
+    icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <circle cx="11" cy="8" r="4"
+          fill={active ? '#fdf0e8' : 'none'}
+          stroke={active ? '#e87648' : '#a89d96'} strokeWidth="1.6"/>
+        <path d="M3 19c0-3.314 3.582-6 8-6s8 2.686 8 6"
+          stroke={active ? '#e87648' : '#a89d96'} strokeWidth="1.6" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
 ]
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState<Tab>('checklist')
+  const [activeTab, setActiveTab] = useState<Tab>('home')
   const [refreshKey, setRefreshKey] = useState(0)
-  const [suggestedInput, setSuggestedInput] = useState('')
 
-  const handleSuccess = () => setRefreshKey((k) => k + 1)
+  const handleSuccess = () => setRefreshKey(k => k + 1)
 
-  const handleSuggestInput = (text: string) => {
-    setSuggestedInput(text)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  // Show magic input on all tabs except account
+  const showInput = activeTab !== 'account'
 
   return (
-    <div
-      className="flex flex-col min-h-screen"
-      style={{ background: '#f5f5f7' }}
-    >
-      {/* ── Header ─────────────────────────────────────────── */}
-      <header
-        className="sticky top-0 z-20 px-6 py-4"
-        style={{
-          background: 'rgba(245,245,247,0.85)',
-          backdropFilter: 'saturate(180%) blur(20px)',
-          WebkitBackdropFilter: 'saturate(180%) blur(20px)',
-          borderBottom: '1px solid rgba(0,0,0,0.06)',
-        }}
-      >
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{ background: '#5e5ce6' }}
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2 4h10M2 7h6M2 10h8" stroke="white" strokeWidth="1.6" strokeLinecap="round" />
-              </svg>
-            </div>
-            <span
-              className="text-base font-semibold tracking-tight"
-              style={{ color: '#1d1d1f', letterSpacing: '-0.02em' }}
-            >
-              Coolist
-            </span>
-          </div>
-          <span
-            className="text-xs font-medium hidden sm:block"
-            style={{ color: '#aeaeb2' }}
-          >
-            Family Organizer
-          </span>
-        </div>
-      </header>
+    <div className="flex flex-col min-h-screen" style={{ background: '#f5f0eb' }}>
 
-      {/* ── Magic Input ─────────────────────────────────────── */}
-      <div
-        className="px-4 pt-8 pb-6"
-        style={{ background: '#f5f5f7' }}
-      >
-        <div className="max-w-2xl mx-auto">
-          <p
-            className="text-center text-xs font-medium uppercase tracking-widest mb-4"
-            style={{ color: '#aeaeb2' }}
-          >
-            What&apos;s on your mind?
-          </p>
-          <MagicInput
-            onSuccess={handleSuccess}
-            defaultValue={suggestedInput}
-            key={suggestedInput}
-          />
+      {/* ── Magic Input (sticky, shown on most tabs) ────────── */}
+      {showInput && (
+        <div
+          className="sticky top-0 z-20 px-4 pt-4 pb-3"
+          style={{
+            background: 'rgba(245,240,235,0.9)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+          }}
+        >
+          <MagicInput onSuccess={handleSuccess} />
         </div>
-      </div>
+      )}
 
-      {/* ── Main content ────────────────────────────────────── */}
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 pb-8">
-        {/* Desktop: 3-column grid */}
-        <div className="hidden md:grid md:grid-cols-3 gap-4">
-          <Module title="Smart Checklist" subtitle="Groceries & tasks">
-            <Checklist />
-          </Module>
-          <Module title="Family Wishlist" subtitle="Wants & dreams">
-            <Wishlist onSuggestInput={handleSuggestInput} refreshKey={refreshKey} />
-          </Module>
-          <Module title="Calendar" subtitle="Upcoming events">
-            <EventCalendar refreshKey={refreshKey} />
-          </Module>
-        </div>
-
-        {/* Mobile: segmented control + single panel */}
-        <div className="md:hidden flex flex-col gap-4">
-          {/* Segmented control */}
-          <div
-            className="flex rounded-xl p-1"
-            style={{ background: 'rgba(116,116,128,0.12)' }}
-          >
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className="flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all"
-                style={
-                  activeTab === tab.id
-                    ? {
-                        background: '#ffffff',
-                        color: '#1d1d1f',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-                      }
-                    : { color: '#6e6e73' }
-                }
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {activeTab === 'checklist' && (
-            <Module title="Smart Checklist" subtitle="Groceries & tasks">
-              <Checklist />
-            </Module>
-          )}
-          {activeTab === 'wishlist' && (
-            <Module title="Family Wishlist" subtitle="Wants & dreams">
-              <Wishlist onSuggestInput={handleSuggestInput} refreshKey={refreshKey} />
-            </Module>
-          )}
-          {activeTab === 'events' && (
-            <Module title="Calendar" subtitle="Upcoming events">
-              <EventCalendar refreshKey={refreshKey} />
-            </Module>
-          )}
-        </div>
+      {/* ── Tab content ─────────────────────────────────────── */}
+      <main className="flex-1 px-4 pt-4 pb-28 max-w-lg mx-auto w-full">
+        {activeTab === 'home'     && <HomeTab />}
+        {activeTab === 'lists'    && <ListsTab refreshKey={refreshKey} />}
+        {activeTab === 'calendar' && <CalendarTab refreshKey={refreshKey} />}
+        {activeTab === 'bills'    && <BillsTab />}
+        {activeTab === 'account'  && <AccountTab />}
       </main>
 
-      {/* Bottom padding on mobile */}
-      <div className="h-6 md:hidden" />
+      {/* ── Bottom Tab Bar ───────────────────────────────────── */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-30 flex items-end pb-safe"
+        style={{
+          background: 'rgba(255,255,255,0.92)',
+          backdropFilter: 'saturate(180%) blur(20px)',
+          WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+          borderTop: '1px solid rgba(0,0,0,0.05)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        }}
+      >
+        {TABS.map(tab => {
+          const active = activeTab === tab.id
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className="flex-1 flex flex-col items-center gap-1 py-3 transition-all"
+            >
+              {tab.icon(active)}
+              <span
+                className="text-[10px] font-semibold transition-colors"
+                style={{ color: active ? '#e87648' : '#a89d96' }}
+              >
+                {tab.label}
+              </span>
+            </button>
+          )
+        })}
+      </nav>
     </div>
-  )
-}
-
-function Module({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string
-  subtitle: string
-  children: React.ReactNode
-}) {
-  return (
-    <section
-      className="rounded-2xl flex flex-col gap-5 p-5"
-      style={{
-        background: '#ffffff',
-        border: '1px solid rgba(0,0,0,0.06)',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-      }}
-    >
-      <div>
-        <h2
-          className="text-sm font-semibold"
-          style={{ color: '#1d1d1f', letterSpacing: '-0.01em' }}
-        >
-          {title}
-        </h2>
-        <p className="text-xs mt-0.5" style={{ color: '#aeaeb2' }}>
-          {subtitle}
-        </p>
-      </div>
-      <div>{children}</div>
-    </section>
   )
 }

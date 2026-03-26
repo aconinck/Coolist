@@ -14,10 +14,7 @@ export default function MagicInput({ onSuccess, defaultValue = '' }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (defaultValue) {
-      setText(defaultValue)
-      inputRef.current?.focus()
-    }
+    if (defaultValue) setText(defaultValue)
   }, [defaultValue])
 
   const showToast = (message: string, ok: boolean) => {
@@ -50,77 +47,54 @@ export default function MagicInput({ onSuccess, defaultValue = '' }: Props) {
   return (
     <div className="relative w-full">
       <div
-        className="flex items-center gap-3 rounded-2xl px-4 py-3.5 transition-all"
+        className="flex items-center gap-3 rounded-2xl px-4 py-3.5"
         style={{
           background: '#ffffff',
-          border: '1px solid rgba(0,0,0,0.08)',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+          border: '1px solid #ede8e3',
+          boxShadow: '0 2px 16px rgba(232,118,72,0.08)',
         }}
       >
         {/* AI sparkle */}
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          className="shrink-0"
-          style={{ color: '#5e5ce6' }}
-        >
-          <path
-            d="M8 1l1.5 4.5L14 7l-4.5 1.5L8 13l-1.5-4.5L2 7l4.5-1.5z"
-            fill="currentColor"
-          />
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+          <path d="M8 1l1.5 4.5L14 7l-4.5 1.5L8 13l-1.5-4.5L2 7l4.5-1.5z" fill="#e87648"/>
         </svg>
 
         <input
           ref={inputRef}
           type="text"
           value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && submit()}
-          placeholder="Add milk, or remind me about soccer practice Thursday…"
-          className="flex-1 bg-transparent outline-none"
-          style={{
-            fontSize: '14px',
-            color: '#1d1d1f',
-            letterSpacing: '-0.01em',
-          }}
+          onChange={e => setText(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && submit()}
+          placeholder="Add milk, remind me about soccer Friday…"
+          className="flex-1 bg-transparent outline-none text-sm"
+          style={{ color: '#1a1410', letterSpacing: '-0.01em' }}
           disabled={loading}
         />
 
         <button
           onClick={submit}
           disabled={loading || !text.trim()}
-          className="shrink-0 rounded-xl px-4 py-1.5 text-xs font-semibold transition-all disabled:opacity-30"
-          style={{
-            background: '#5e5ce6',
-            color: '#ffffff',
-            letterSpacing: '-0.01em',
-          }}
+          className="shrink-0 rounded-xl px-4 py-1.5 text-xs font-bold transition-all disabled:opacity-30"
+          style={{ background: '#e87648', color: '#ffffff', letterSpacing: '-0.01em' }}
         >
           {loading ? (
             <span className="flex items-center gap-1.5">
               <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
               </svg>
-              Thinking
             </span>
-          ) : (
-            'Add'
-          )}
+          ) : 'Add'}
         </button>
       </div>
 
-      {/* Toast */}
       {toast && (
         <div
-          className="absolute top-full mt-2 left-0 right-0 text-center text-xs font-medium py-2.5 px-4 rounded-xl"
+          className="absolute top-full mt-2 left-0 right-0 text-center text-xs font-semibold py-2.5 px-4 rounded-2xl z-50"
           style={{
-            background: toast.ok ? '#34c759' : '#ff3b30',
+            background: toast.ok ? '#4caf7d' : '#e05c5c',
             color: '#ffffff',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            letterSpacing: '-0.01em',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
           }}
         >
           {toast.message}
